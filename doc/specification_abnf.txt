@@ -1,0 +1,43 @@
+; general structure
+command = name *1(sps path) *(sps argument) *(sps option)
+
+; command's name
+name = 1*lowercase *(hyphen 1*(lowercase / digit))
+
+; command's path
+path = 1*lowercase *(dot 1*(lowercase / digit))
+
+; command's argument
+argument = number / string
+
+; command's option
+option = boolean-option / number-option / string-option / array-option
+boolean-option = option-name
+number-option = option-name sps number
+string-option = option-name sps string
+array-option = option-name sps (array-nubmer / array-string)
+option-name = hyphen 1*lowercase
+
+; data type - string
+string = string-with-space / string-without-space
+string-with-space = single-quote *char-with-space single-quote
+string-without-space = 1*char-without-space
+
+; data type - array
+array = array-number / array-string
+array-number = number *(sps number)
+array-string = string *(sps string)
+
+; data type - number
+number = integer / real
+integer = 1*digit
+real = 1*digit *1(dot 1*digit)
+
+; etc
+sps = 1*space
+lowercase = %x41-5A / %x61-7A
+digit = %x30-39
+dot = %x2E
+single-quote = %x27
+char-with-space = %x20-10FFFF
+char-without-space = %x21-10FFFF
