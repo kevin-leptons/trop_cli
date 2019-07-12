@@ -1,5 +1,20 @@
+; This grammar build for terminal sets in range 0x0 to 0x10FFFF. It is
+; corresponding with code points in Unicode standard. Howerver, terminals
+; 0x0-1F is not not uses because that range includes control characters.
+;
+; ANBF is not enough powerful to specific logic rules. That is reasons why
+; below rules MUST apply after grammar parsing step:
+;
+; * option-id is unique in a command. That mean an option ID is represents
+;   at most a time in a command.
+; * number range and precision depends on parser implementations. That mean
+;   rules does not specific range of number or precision.
+; * a number without signed is positive number.
+
 ; general structure
-command = name *1(sps path) *(sps argument) *(sps option)
+command = simple-command / complex-command
+simple-command = name *(white-space argument) *(white-space option)
+complex-command = name white-space path *(white-space argument) *(white-space option)
 
 ; command's name
 name = 1*lowercase *(hyphen 1*(lowercase / digit))
@@ -8,36 +23,43 @@ name = 1*lowercase *(hyphen 1*(lowercase / digit))
 path = 1*lowercase *(dot 1*(lowercase / digit))
 
 ; command's argument
-argument = number / string
+argument = data 
 
 ; command's option
 option = boolean-option / number-option / string-option / array-option
-boolean-option = option-name
-number-option = option-name sps number
-string-option = option-name sps string
-array-option = option-name sps (array-nubmer / array-string)
-option-name = hyphen 1*lowercase
+boolean-option = option-id
+number-option = option-id white-space number
+string-option = option-id white-space string
+array-option = option-id white-space array
+option-id = hyphen 1*lowercase
+
+; data type
+data = number / string / array
+
+; data type - number
+number = integer / float
+integer = [plus / minus] 1*digit
+float = [plus / minus] 1*digit [dot 1*digit]
 
 ; data type - string
 string = string-with-space / string-without-space
-string-with-space = single-quote *char-with-space single-quote
+string-with-space = single-quote 1*char-with-space single-quote
 string-without-space = 1*char-without-space
 
 ; data type - array
 array = array-number / array-string
-array-number = number *(sps number)
-array-string = string *(sps string)
-
-; data type - number
-number = integer / real
-integer = 1*digit
-real = 1*digit *1(dot 1*digit)
+array-number = number *(white-space number)
+array-string = string *(white-space string)
 
 ; etc
-sps = 1*space
+space = " "
+white-space = 1*space
 lowercase = %x41-5A / %x61-7A
 digit = %x30-39
-dot = %x2E
-single-quote = %x27
+dot = "."
+hyphen = "-"
+plus = "+"
+minus = "-"
+single-quote = "'"
 char-with-space = %x20-10FFFF
 char-without-space = %x21-10FFFF
