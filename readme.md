@@ -1,5 +1,7 @@
 # @trop/cli
 
+**Note**: In building of specification and APIs, does not ready to use.
+
 A standard and tool to build command programs. Without a standard, command
 line structure can be different between groups, organizations, then chaos
 happens, end-users get confused. Without command line build tool, building is
