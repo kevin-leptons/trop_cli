@@ -8,12 +8,12 @@
 ;   * ls "the directory"
 ;
 ; The problem with above approach is it requires an abstract concept:
-; seperator as rule "sep". Seperator is divider between items of process
+; separator as rule "sep". Separator is divider between items of process
 ; arguments, so an process argument can be represent by: 
 ;
 ;   arg1 sep arg2 sep arg3 ...
 ;
-; Since seperator is an abstract concepts, it does not represents for any
+; Since separator is an abstract concepts, it does not represents for any
 ; terminals. So it is not an ABNF rule and it is uses in limited rules which
 ; describe command structure such as "command", "simple-command" and
 ; "complex-command", "option" and "array". 
