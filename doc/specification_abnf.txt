@@ -1,65 +1,76 @@
-; This grammar build for terminal sets in range 0x0 to 0x10FFFF. It is
-; corresponding with code points in Unicode standard. However, terminals
-; 0x0-1F is not not uses because that range includes control characters.
+; It is not efficiency to describe command as string because command parsing
+; is not unified on various platform. It is better for description which start
+; with process arguments. For example, two commands give the same process
+; arguments ["ls", "thedirectory"], even it uses different quote or run on 
+; different platforms:
+;
+;   * ls 'the directory'
+;   * ls "the directory"
+;
+; The problem with above approach is it requires an abstract concept:
+; seperator as rule "sep". Seperator is divider between items of process
+; arguments, so an process argument can be represent by: 
+;
+;   arg1 sep arg2 sep arg3 ...
+;
+; Since seperator is an abstract concepts, it does not represents for any
+; terminals. So it is not an ABNF rule and it is uses only in pseudo rules
+; "command", "simple-command" and "complex-command" to describe command
+; structure.
 ;
 ; ANBF is not enough powerful to specific logic rules. That is reasons why
 ; below rules MUST apply after grammar parsing step:
 ;
-; * option-id is unique in a command. That mean an option ID is represents
-;   at most a time in a command.
-; * number range and precision depends on parser implementations. That mean
-;   rules does not specific range of number or precision.
-; * a number without signed is positive number.
+;   * option-id is unique in a command. That mean an option ID is represents
+;     at most a time in a command.
+;
+; There are few exammple commands, for Bash shell:
+;
+;   # compress file1, file2 and file3 to compressed_file
+;   compress file1 file2 fil3 compressed_file
+;
+;   # extract compressed file to directory data
+;   decompress compressed_file -to data
 
 ; general structure
+;
+; Simple command is uses for one-function command such as compress or
+; decompres above.
+; 
+; Complex command is uses for multi-function command. For example, compress
+; and decompress can be merge into a command called archive, and use like
+; this:
+;
+;   # compress file1, file2 and file3 to compressed_file
+;   archive compress file1 file2 file3 compressed_file
+;
+;   # extract compressed file to directory data
+;   archive decompress compressed_file -to data
 command = simple-command / complex-command
-simple-command = name *(white-space argument) *(white-space option)
-complex-command = name white-space path *(white-space argument) *(white-space option)
+simple-command = id *(sep argument) *(sep option)
+complex-command = id path *(sep argument) *(sep option)
 
-; command's name
-name = 1*lowercase *(hyphen 1*(lowercase / digit))
+; command's id
+id = 1*lowercase *(hyphen 1*(lowercase / digit))
+
+; command's argument
+argument = string
 
 ; command's path
 path = 1*lowercase *(dot 1*(lowercase / digit))
 
-; command's argument
-argument = data 
-
 ; command's option
-option = boolean-option / number-option / string-option / array-option
+option = boolean-option / string-option / array-option
 boolean-option = option-id
-number-option = option-id white-space number
-string-option = option-id white-space string
-array-option = option-id white-space array
+string-option = option-id sep string
+array-option = option-id sep array
 option-id = hyphen 1*lowercase
-
-; data type
-data = number / string / array
-
-; data type - number
-number = integer / float
-integer = [plus / minus] 1*digit
-float = [plus / minus] 1*digit [dot 1*digit]
-
-; data type - string
-string = string-with-space / string-without-space
-string-with-space = single-quote 1*char-with-space single-quote
-string-without-space = 1*char-without-space
-
-; data type - array
-array = array-number / array-string
-array-number = number *(white-space number)
-array-string = string *(white-space string)
+array = 1*string
 
 ; etc
-space = " "
-white-space = 1*space
+any = %x00-10FFFF
 lowercase = %x41-5A / %x61-7A
 digit = %x30-39
 dot = "."
 hyphen = "-"
-plus = "+"
-minus = "-"
-single-quote = "'"
-char-with-space = %x20-10FFFF
-char-without-space = %x21-10FFFF
+string = 1*any
