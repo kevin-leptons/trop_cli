@@ -14,9 +14,9 @@
 ;   arg1 sep arg2 sep arg3 ...
 ;
 ; Since seperator is an abstract concepts, it does not represents for any
-; terminals. So it is not an ABNF rule and it is uses only in pseudo rules
-; "command", "simple-command" and "complex-command" to describe command
-; structure.
+; terminals. So it is not an ABNF rule and it is uses in limited rules which
+; describe command structure such as "command", "simple-command" and
+; "complex-command", "option" and "array". 
 ;
 ; ANBF is not enough powerful to specific logic rules. That is reasons why
 ; below rules MUST apply after grammar parsing step:
@@ -65,7 +65,7 @@ boolean-option = option-id
 string-option = option-id sep string
 array-option = option-id sep array
 option-id = hyphen 1*lowercase
-array = 1*string
+array = string *(sep string)
 
 ; etc
 any = %x00-10FFFF
