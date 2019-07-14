@@ -29,7 +29,7 @@
     "mocha": "^6.1.4"
   },
   "dependencies": {
-    "@trop/gear": "^0.2.0",
+    "@trop/gear": "^0.3.0",
     "ajv": "^6.10.0"
   }
 }
