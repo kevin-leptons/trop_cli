@@ -71,14 +71,18 @@ ABNF specification:
 ```text
 ; general structure
 command = simple-command / complex-command
-simple-command = id *(sep argument) *(sep option)
-complex-command = id path *(sep argument) *(sep option)
+simple-command = id *argument-list *(sep option)
+complex-command = id path *argument-list *(sep option)
 
 ; command's identity
 id = 1*lowercase *(hyphen 1*(lowercase / digit))
 
 ; command's argument
+argument-list = argument-list-non-array / argument-list-array
+argument-list-non-array = 1*(sep argument)
+argument-list-array = 1*(sep argument) argument-array
 argument = string
+argument-array = 1*(sep argument)
 
 ; command's path
 path = 1*lowercase *(dot 1*(lowercase / digit))
